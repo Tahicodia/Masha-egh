@@ -1,31 +1,29 @@
 public class Main {
-    public static void main(){
+   public static void main(String[] args) {
         task1();
         task2();
         task3();
     }
 
     static void task1() {
-        Logger.log("Main", "Завдання 1: щоденні маршрути");
+    Logger.log("Main", "Завдання 1: щоденні маршрути");
 
-        // 1. Еталон (дорога побудова)
-        Route reference = new Route("Чернівці – Кам'янець – Вінниця", 1000,
-                "Чернівці", "Кам'янець", "Вінниця");
+    Route reference = new Route("Чернівці – Хотин – Кельменці", 1000,
+            "Чернівці", "Хотин", "Кельменці");
 
-        // 2. Три маршрути на 3 дні без повторної побудови
-        Route day1 = reference.copy("2026-11-06", "Агеєнко");
-        Route day2 = reference.copy("2026-11-07", "Агеєнко");
-        Route day3 = reference.copy("2026-11-08", "Агеєнко");
+    Route day1 = reference.copy("2026-11-06", "Агеєнко");
+    Route day2 = reference.copy("2026-11-07", "Агеєнко");
+    Route day3 = reference.copy("2026-11-08", "Агеєнко");
 
-        // 3. Зміни в одному маршруті
-        day2.addStop("Дунаївці");
-        day2.setMaxKg(500);
-        day2.setCourier("Бісмілля");
+    day2.addStop("Дунаївці");
+    day2.setMaxKg(500);
+    day2.setCourier("Бісмілля");
 
-        // 4. Еталон і змінений маршрут поруч
-        Logger.log("Main", "Еталон:   " + reference);
-        Logger.log("Main", "Маршрут 2: " + day2);
-    }
+    Logger.log("Main", "Еталон:   " + reference);
+    Logger.log("Main", "Маршрут 1: " + day1);
+    Logger.log("Main", "Маршрут 2: " + day2);
+    Logger.log("Main", "Маршрут 3: " + day3);
+}
 
     static void task2() {
         Logger.log("Main", "Завдання 2: службові фургони");

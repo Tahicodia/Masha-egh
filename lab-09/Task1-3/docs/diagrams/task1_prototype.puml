@@ -1,0 +1,53 @@
+@startuml task1_prototype
+title Завдання 1. Prototype — щоденні маршрути доставки
+skinparam classAttributeIconSize 0
+
+class Route <<ConcretePrototype>> {
+  -name: String {readOnly}
+  -date: String
+  -courier: String
+  -stops: List<Stop>
+  -limit: WeightLimit {readOnly}
+  +Route(name: String, maxKg: int, stopNames: String...)
+  -Route(other: Route)
+  +copy(date: String, courier: String): Route
+  +addStop(stopName: String)
+  +setMaxKg(kg: int)
+  +setCourier(courier: String)
+  +toString(): String
+}
+class Stop <<Nested prototype>> {
+  -name: String
+  +Stop(name: String)
+  +Stop(other: Stop)
+  +toString(): String
+}
+class WeightLimit <<Nested prototype>> {
+  -maxKg: int
+  +WeightLimit(maxKg: int)
+  +WeightLimit(other: WeightLimit)
+  +setMaxKg(kg: int)
+  +toString(): String
+}
+class Main <<Client>> {
+  +{static} main(args: String[])
+  ~{static} task1()
+}
+class Logger <<Utility>> {
+  +{static} log(service: String, event: String)
+}
+
+Route "1" *-- "0..*" Stop : stops
+Route "1" *-- "1" WeightLimit : limit
+Route ..> Route : <<create>> deep copy\n(copy → private Route(other))
+Main ..> Route : створює еталон,\nвикликає copy()
+Route ..> Logger
+Main ..> Logger
+
+note right of Route
+  Prototype: copy() клонує еталон
+  без дорогого конструктора.
+  Глибока копія: Stop і WeightLimit
+  копіюються окремо.
+end note
+@enduml

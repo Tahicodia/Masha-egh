@@ -1,0 +1,53 @@
+@startuml task2_object_pool
+title Завдання 2. Object Pool — службові фургони
+skinparam classAttributeIconSize 0
+
+class VanPool <<ObjectPool>> {
+  -max: int
+  -all: List<Van>
+  -free: Queue<Van>
+  -waiting: Queue<String>
+  +VanPool(max: int)
+  +request(courier: String): Van
+  +release(van: Van)
+  +printStats()
+}
+class Van <<PooledObject>> {
+  -id: String
+  -courier: String
+  -shipments: List<String>
+  -trips: int
+  +Van(id: String)
+  +assign(courier: String)
+  +load(shipment: String)
+  +unload()
+  +getId(): String
+  +getTrips(): int
+}
+class Main <<Client>> {
+  +{static} main(args: String[])
+  ~{static} task2()
+}
+class Logger <<Utility>> {
+  +{static} log(service: String, event: String)
+}
+
+VanPool "1" o-- "0..3" Van : all (створені)
+VanPool "1" o-- "0..*" Van : free (вільні)
+Main ..> VanPool : request() / release()
+VanPool ..> Van : <<create>> (ліниво, до max)
+VanPool ..> Logger
+Van ..> Logger
+Main ..> Logger
+
+note right of VanPool
+  max = 3. Черга очікування — FIFO.
+  release(): unload() скидає стан,
+  далі фургон іде наступному в черзі
+  або у free без повторної підготовки.
+end note
+note bottom of Van
+  Конструктор = дорога підготовка
+  (огляд, заправка, шляховий лист).
+end note
+@enduml

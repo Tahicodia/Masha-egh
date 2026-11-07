@@ -1,0 +1,41 @@
+@startuml task3_singleton
+title Завдання 3. Singleton — служба нумерації накладних
+skinparam classAttributeIconSize 0
+
+class NumberingService <<Singleton>> {
+  -{static} instance: NumberingService
+  -id: String {readOnly}
+  -counter: long
+  -NumberingService()
+  +{static} getInstance(): NumberingService
+  +next(): long
+  +getId(): String
+}
+class Registrar <<Client>> {
+  -name: String {readOnly}
+  +Registrar(name: String)
+  +registerShipment()
+  +getServiceId(): String
+}
+class Main <<Client>> {
+  +{static} main(args: String[])
+  ~{static} task3()
+}
+class Logger <<Utility>> {
+  +{static} log(service: String, event: String)
+}
+
+NumberingService --> "0..1" NumberingService : instance
+Registrar ..> NumberingService : getInstance()
+Main "1" --> "3" Registrar : відділення №1,\nвідділення №2,\nонлайн-кабінет
+Main ..> Registrar
+NumberingService ..> Logger
+Registrar ..> Logger
+
+note right of NumberingService
+  Приватний конструктор,
+  статичний synchronized getInstance().
+  Одна служба на всю компанію.
+end note
+@enduml
+
