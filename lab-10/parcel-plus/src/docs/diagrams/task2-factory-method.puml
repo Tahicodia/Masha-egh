@@ -1,0 +1,67 @@
+@startuml
+skinparam classAttributeIconSize 0
+title Завдання 2: Способи доставки (Factory Method)
+
+abstract class DeliveryService <<Creator>> {
+  #{abstract} createDelivery(): Delivery
+  +process(shipment: Shipment): void {final}
+}
+class CourierDeliveryService <<ConcreteCreator>> {
+  #createDelivery(): Delivery
+}
+class ParcelLockerDeliveryService <<ConcreteCreator>> {
+  #createDelivery(): Delivery
+}
+class PostOfficeDeliveryService <<ConcreteCreator>> {
+  #createDelivery(): Delivery
+}
+class FloorDeliveryService <<ConcreteCreator>> {
+  #createDelivery(): Delivery
+}
+
+interface Delivery <<Product>> {
+  +getName(): String
+  +calculateCost(s: Shipment): double
+  +calculateDays(s: Shipment): int
+  +executor(): String
+}
+class CourierDelivery <<ConcreteProduct>>
+class ParcelLockerDelivery <<ConcreteProduct>>
+class PostOfficeDelivery <<ConcreteProduct>>
+class FloorDelivery <<ConcreteProduct>>
+
+class Shipment {
+  -id: String
+  -weightKg: double
+  -address: String
+  +getWeightKg(): double
+  +getAddress(): String
+}
+
+CourierDeliveryService --|> DeliveryService
+ParcelLockerDeliveryService --|> DeliveryService
+PostOfficeDeliveryService --|> DeliveryService
+FloorDeliveryService --|> DeliveryService
+
+CourierDelivery ..|> Delivery
+ParcelLockerDelivery ..|> Delivery
+PostOfficeDelivery ..|> Delivery
+FloorDelivery ..|> Delivery
+
+CourierDeliveryService ..> CourierDelivery : <<create>> "1"
+ParcelLockerDeliveryService ..> ParcelLockerDelivery : <<create>> "1"
+PostOfficeDeliveryService ..> PostOfficeDelivery : <<create>> "1"
+FloorDeliveryService ..> FloorDelivery : <<create>> "1"
+
+DeliveryService ..> Delivery : uses "1"
+DeliveryService ..> Shipment : uses
+
+note right of DeliveryService
+  process() = шаблонний метод:
+  перевірка адреси, createDelivery(),
+  вартість і строк, виконавець, реєстрація
+end note
+note bottom of FloorDeliveryService
+  Додається без змін у DeliveryService
+end note
+@enduml

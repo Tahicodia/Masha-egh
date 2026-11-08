@@ -1,0 +1,108 @@
+@startuml
+skinparam classAttributeIconSize 0
+title Завдання 1: Пакування (Abstract Factory)
+
+interface PackagingFactory <<AbstractFactory>> {
+  +createBox(): Box
+  +createFiller(): Filler
+  +createLabel(): Label
+  +kitName(): String
+}
+interface Box <<AbstractProduct>> {
+  +kit(): String
+  +describe(): String
+}
+interface Filler <<AbstractProduct>> {
+  +kit(): String
+  +describe(): String
+}
+interface Label <<AbstractProduct>> {
+  +kit(): String
+  +describe(): String
+}
+class PackingStation <<Client>> {
+  -SRC: String
+  +pack(shipment: Shipment, factory: PackagingFactory): void
+}
+class Shipment {
+  -id: String
+  -weightKg: double
+  -address: String
+  +getId(): String
+}
+
+class StandardPackagingFactory <<ConcreteFactory>> {
+  -{static} KIT: String
+}
+class FragilePackagingFactory <<ConcreteFactory>> {
+  -{static} KIT: String
+}
+class ColdPackagingFactory <<ConcreteFactory>> {
+  -{static} KIT: String
+}
+class OversizedPackagingFactory <<ConcreteFactory>> {
+  -{static} KIT: String
+}
+
+class StandardBox <<ConcreteProduct>>
+class StandardFiller <<ConcreteProduct>>
+class StandardLabel <<ConcreteProduct>>
+class FragileBox <<ConcreteProduct>>
+class FragileFiller <<ConcreteProduct>>
+class FragileLabel <<ConcreteProduct>>
+class ColdBox <<ConcreteProduct>>
+class ColdFiller <<ConcreteProduct>>
+class ColdLabel <<ConcreteProduct>>
+class OversizedBox <<ConcreteProduct>>
+class OversizedFiller <<ConcreteProduct>>
+class OversizedLabel <<ConcreteProduct>>
+
+StandardPackagingFactory ..|> PackagingFactory
+FragilePackagingFactory ..|> PackagingFactory
+ColdPackagingFactory ..|> PackagingFactory
+OversizedPackagingFactory ..|> PackagingFactory
+
+StandardBox ..|> Box
+FragileBox ..|> Box
+ColdBox ..|> Box
+OversizedBox ..|> Box
+StandardFiller ..|> Filler
+FragileFiller ..|> Filler
+ColdFiller ..|> Filler
+OversizedFiller ..|> Filler
+StandardLabel ..|> Label
+FragileLabel ..|> Label
+ColdLabel ..|> Label
+OversizedLabel ..|> Label
+
+StandardPackagingFactory ..> StandardBox : <<create>> "1"
+StandardPackagingFactory ..> StandardFiller : <<create>> "1"
+StandardPackagingFactory ..> StandardLabel : <<create>> "1"
+FragilePackagingFactory ..> FragileBox : <<create>> "1"
+FragilePackagingFactory ..> FragileFiller : <<create>> "1"
+FragilePackagingFactory ..> FragileLabel : <<create>> "1"
+ColdPackagingFactory ..> ColdBox : <<create>> "1"
+ColdPackagingFactory ..> ColdFiller : <<create>> "1"
+ColdPackagingFactory ..> ColdLabel : <<create>> "1"
+OversizedPackagingFactory ..> OversizedBox : <<create>> "1"
+OversizedPackagingFactory ..> OversizedFiller : <<create>> "1"
+OversizedPackagingFactory ..> OversizedLabel : <<create>> "1"
+
+PackagingFactory ..> Box : creates "1"
+PackagingFactory ..> Filler : creates "1"
+PackagingFactory ..> Label : creates "1"
+
+PackingStation ..> PackagingFactory : uses
+PackingStation ..> Shipment : uses
+PackingStation ..> Box
+PackingStation ..> Filler
+PackingStation ..> Label
+
+note right of PackingStation
+  Клієнт знає лише абстракції,
+  без if/switch за типом відправлення
+end note
+note bottom of OversizedPackagingFactory
+  Додається без змін у PackingStation
+end note
+@enduml

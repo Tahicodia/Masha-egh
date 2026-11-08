@@ -1,0 +1,61 @@
+@startuml
+skinparam classAttributeIconSize 0
+title Завдання 3: Накладна (Builder)
+
+class WaybillDirector <<Director>> {
+  +buildDocuments(b: WaybillBuilder, sender: String, recipient: String, phone: String): Waybill
+  +buildParcelWithCod(b: WaybillBuilder, sender: String, recipient: String, phone: String, cod: double): Waybill
+}
+
+class WaybillBuilder <<Builder>> {
+  ~sender: String
+  ~recipientName: String
+  ~recipientPhone: String
+  ~weightKg: double
+  ~dimensions: String
+  ~declaredValue: double
+  ~cashOnDelivery: double
+  ~returnDocuments: boolean
+  ~packing: boolean
+  ~insurance: boolean
+  +sender(sender: String): WaybillBuilder
+  +recipient(name: String, phone: String): WaybillBuilder
+  +weight(kg: double): WaybillBuilder
+  +dimensions(d: String): WaybillBuilder
+  +declaredValue(v: double): WaybillBuilder
+  +cashOnDelivery(v: double): WaybillBuilder
+  +returnDocuments(): WaybillBuilder
+  +packing(): WaybillBuilder
+  +insurance(): WaybillBuilder
+  +build(): Waybill
+}
+
+class Waybill <<Product>> {
+  -sender: String
+  -recipientName: String
+  -recipientPhone: String
+  -weightKg: double
+  -dimensions: String
+  -declaredValue: double
+  -cashOnDelivery: double
+  -returnDocuments: boolean
+  -packing: boolean
+  -insurance: boolean
+  ~Waybill(b: WaybillBuilder)
+  +toString(): String
+}
+
+WaybillDirector ..> WaybillBuilder : керує кроками
+WaybillBuilder ..> Waybill : <<create>> "0..1"
+Waybill ..> WaybillBuilder : копіює дані
+
+note right of WaybillBuilder
+  build() перевіряє: відправник,
+  отримувач з телефоном, вага > 0.
+  Помилка: IllegalStateException
+end note
+note bottom of Waybill
+  Незмінний (immutable):
+  усі поля final, конструктор не public
+end note
+@enduml
