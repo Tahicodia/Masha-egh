@@ -2,6 +2,7 @@ public class Main {
     public static void main() {
         task1();
         task2();
+        task3();
     }
 
     static void task1() {
@@ -39,5 +40,32 @@ public class Main {
     static void show(Shipment s){
         Logger.log("Main", "Опис: " + s.getDescription());
         Logger.log("Main", "Підсумкова вартість: " + s.getPrice() + " грн");
+    }
+
+    static void task3(){
+        Logger.log("Main", "Трекінг партнера (Proxy)");
+
+        Clock clock = new Clock();
+        PartnerTrackingService partner = new PartnerTrackingService();
+        // Кабінет бачить лише інтерфейс TrackingService
+        TrackingService page = new CachingTrackingProxy(partner, clock, 300);
+
+        // 1. Перший запит, платний
+        Logger.log("Онлайн-кабінет", "запитує статус UA-1");
+        page.getStatus("UA-1");
+
+        // 2. Ще 3 запити, з кешу
+        for (int i = 0; i < 3; i++) {
+            Logger.log("Онлайн-кабінет", "оновлює сторінку, запитує статус UA-1");
+            page.getStatus("UA-1");
+        }
+
+        // 3. Спливає час (5 хв), новий платний запит
+        clock.advance(301);
+        Logger.log("Main", "минуло 301 с, кеш застарів");
+        Logger.log("Онлайн-кабінет", "запитує статус UA-1");
+        page.getStatus("UA-1");
+
+        Logger.log("Main", "Кількість платних запитів: " + partner.getPaidRequests());
     }
 }
