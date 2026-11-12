@@ -3,6 +3,7 @@ public class Main {
         task1();
         task2();
         task3();
+        task4();
     }
 
     static void task1() {
@@ -67,5 +68,18 @@ public class Main {
         page.getStatus("UA-1");
 
         Logger.log("Main", "Кількість платних запитів: " + partner.getPaidRequests());
+    }
+
+    static void task4() {
+        Logger.log("Main", "=== Завдання 4: ваги партнера (Adapter) ===");
+        CostCalculator calculator = new CostCalculator();
+
+        // Відділення з новими вагами (через адаптер)
+        Scale newScale = new PartnerScaleAdapter(new PartnerScale());
+        calculator.calculate("Відділення №1 (нові ваги)", newScale);
+
+        // Відділення зі старими вагами
+        Scale oldScale = new OldScale();
+        calculator.calculate("Відділення №2 (старі ваги)", oldScale);
     }
 }
