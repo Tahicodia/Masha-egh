@@ -1,0 +1,48 @@
+---
+title: Завдання 3. Трекінг партнера (Proxy)
+---
+classDiagram
+    class Main {
+        <<Client>>
+        +main(String[] args)$ void
+        -task3()$ void
+    }
+    class TrackingService {
+        <<Subject, interface>>
+        +getStatus(String waybill) String
+    }
+    class PartnerTrackingService {
+        <<RealSubject>>
+        -int paidRequests
+        +getStatus(String waybill) String
+        +getPaidRequests() int
+    }
+    class CachingTrackingProxy {
+        <<Proxy>>
+        -TrackingService real
+        -Clock clock
+        -long ttl
+        -Map~String,String~ statuses
+        -Map~String,Long~ times
+        +CachingTrackingProxy(TrackingService real, Clock clock, long ttl)
+        +getStatus(String waybill) String
+    }
+    class Clock {
+        <<Helper>>
+        -long now
+        +now() long
+        +advance(long seconds) void
+    }
+    class Logger {
+        <<Utility>>
+        +log(String source, String event)$ void
+    }
+    Main ..> TrackingService : use
+    TrackingService <|.. PartnerTrackingService
+    TrackingService <|.. CachingTrackingProxy
+    CachingTrackingProxy "1" --> "1" TrackingService : -real
+    CachingTrackingProxy "1" --> "1" Clock : -clock
+    note for Main "Клієнт: онлайн-кабінет, бачить лише TrackingService"
+    note for PartnerTrackingService "Платний віддалений сервіс"
+    note for CachingTrackingProxy "Свіжий запис у кеші: відповідь без звернення до сервісу. Інакше запит до real"
+    note for Logger "Усі класи пишуть у журнал через Logger.log()"

@@ -1,0 +1,53 @@
+---
+title: Завдання 1. Оформлення відправлення (Facade)
+---
+classDiagram
+    class Main {
+        <<Client>>
+        +main(String[] args)$ void
+        -task1()$ void
+    }
+    class ShipmentFacade {
+        <<Facade>>
+        +register(String channel, String receiver, String address, double weightKg) String
+    }
+    class AddressValidator {
+        <<Subsystem>>
+        +validate(String address) boolean
+    }
+    class PriceCalculator {
+        <<Subsystem>>
+        +calculate(double weightKg) double
+    }
+    class PaymentService {
+        <<Subsystem>>
+        +charge(double amount) void
+    }
+    class WaybillGenerator {
+        <<Subsystem>>
+        -int counter
+        +generate() String
+    }
+    class RoutePlanner {
+        <<Subsystem>>
+        +plan(String address) void
+    }
+    class Notifier {
+        <<Subsystem>>
+        +notifyReceiver(String receiver, String waybill) void
+    }
+    class Logger {
+        <<Utility>>
+        +log(String source, String event)$ void
+    }
+    Main ..> ShipmentFacade : use register()
+    Main ..> PriceCalculator : use, окремий розрахунок
+    ShipmentFacade "1" *-- "1" AddressValidator : -validator
+    ShipmentFacade "1" *-- "1" PriceCalculator : -calculator
+    ShipmentFacade "1" *-- "1" PaymentService : -payment
+    ShipmentFacade "1" *-- "1" WaybillGenerator : -waybills
+    ShipmentFacade "1" *-- "1" RoutePlanner : -planner
+    ShipmentFacade "1" *-- "1" Notifier : -notifier
+    note for ShipmentFacade "Уся послідовність оформлення в одному місці"
+    note for Main "Клієнт: відділення, онлайн-кабінет, термінал"
+    note for Logger "Усі класи пишуть у журнал через Logger.log()"

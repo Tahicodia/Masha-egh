@@ -1,0 +1,67 @@
+---
+title: Завдання 2. Додаткові послуги (Decorator)
+---
+classDiagram
+    class Main {
+        <<Client>>
+        +main(String[] args)$ void
+        -task2()$ void
+        -show(Shipment s)$ void
+    }
+    class Shipment {
+        <<Component, interface>>
+        +getDescription() String
+        +getPrice() double
+    }
+    class BasicShipment {
+        <<ConcreteComponent>>
+        -String description
+        -double price
+        +BasicShipment(String description, double price)
+        +getDescription() String
+        +getPrice() double
+    }
+    class ShipmentDecorator {
+        <<Decorator, abstract>>
+        -Shipment wrapped
+        -String name
+        -double extra
+        #ShipmentDecorator(Shipment wrapped, String name, double extra)
+        +getDescription() String
+        +getPrice() double
+    }
+    class Insurance {
+        <<ConcreteDecorator>>
+        +Insurance(Shipment s)
+    }
+    class Packaging {
+        <<ConcreteDecorator>>
+        +Packaging(Shipment s)
+    }
+    class CashOnDelivery {
+        <<ConcreteDecorator>>
+        +CashOnDelivery(Shipment s)
+    }
+    class WeekendDelivery {
+        <<ConcreteDecorator>>
+        +WeekendDelivery(Shipment s)
+    }
+    class SmsNotification {
+        <<ConcreteDecorator>>
+        +SmsNotification(Shipment s)
+    }
+    class Logger {
+        <<Utility>>
+        +log(String source, String event)$ void
+    }
+    Main ..> Shipment : use
+    Shipment <|.. BasicShipment
+    Shipment <|.. ShipmentDecorator
+    ShipmentDecorator "1" o-- "1" Shipment : -wrapped
+    ShipmentDecorator <|-- Insurance
+    ShipmentDecorator <|-- Packaging
+    ShipmentDecorator <|-- CashOnDelivery
+    ShipmentDecorator <|-- WeekendDelivery
+    ShipmentDecorator <|-- SmsNotification
+    note for ShipmentDecorator "Додає назву послуги до опису і свою ціну до вартості обгорнутого об'єкта"
+    note for Logger "Усі класи пишуть у журнал через Logger.log()"

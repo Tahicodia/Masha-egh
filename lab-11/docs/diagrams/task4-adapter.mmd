@@ -1,0 +1,49 @@
+---
+title: Завдання 4. Ваги партнера (Adapter)
+---
+classDiagram
+    class Main {
+        <<Runner>>
+        +main(String[] args)$ void
+        -task4()$ void
+    }
+    class CostCalculator {
+        <<Client>>
+        +calculate(String branch, Scale scale) double
+    }
+    class Scale {
+        <<Target, interface>>
+        +getWeightKg() double
+        +getLengthCm() double
+    }
+    class OldScale {
+        +getWeightKg() double
+        +getLengthCm() double
+    }
+    class PartnerScaleAdapter {
+        <<Adapter>>
+        -PartnerScale partner
+        +PartnerScaleAdapter(PartnerScale partner)
+        +getWeightKg() double
+        +getLengthCm() double
+    }
+    class PartnerScale {
+        <<Adaptee>>
+        +readPounds() double
+        +readInches() double
+    }
+    class Logger {
+        <<Utility>>
+        +log(String source, String event)$ void
+    }
+    Main ..> CostCalculator : use
+    Main ..> Scale : create
+    CostCalculator ..> Scale : use
+    Scale <|.. OldScale
+    Scale <|.. PartnerScaleAdapter
+    PartnerScaleAdapter "1" o-- "1" PartnerScale : -partner
+    note for CostCalculator "Система оформлення знає лише Scale"
+    note for OldScale "Старі ваги: кг і см, вже сумісні зі Scale"
+    note for PartnerScaleAdapter "Єдине місце перетворення: фунти x 0.45359237 = кг, дюйми x 2.54 = см"
+    note for PartnerScale "Чужий API, змінювати не можна"
+    note for Logger "Усі класи пишуть у журнал через Logger.log()"
