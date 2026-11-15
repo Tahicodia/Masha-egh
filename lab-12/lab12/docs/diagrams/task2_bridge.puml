@@ -1,0 +1,52 @@
+@startuml task2_bridge
+title Завдання 2. Сповіщення клієнтів (Bridge)
+skinparam classAttributeIconSize 0
+
+abstract class Notification <<Abstraction>> {
+  # channel : Channel
+  # Notification(channel : Channel)
+  + setChannel(channel : Channel) : void
+  # {abstract} buildText() : String
+  + send(recipient : String) : void
+}
+class ArrivalNotification <<RefinedAbstraction>> {
+  - branch : String
+  # buildText() : String
+}
+class DelayNotification <<RefinedAbstraction>> {
+  - hours : int
+  # buildText() : String
+}
+class PaymentNotification <<RefinedAbstraction>> {
+  - amount : double
+  # buildText() : String
+}
+
+interface Channel <<Implementor>> {
+  + getName() : String
+  + deliver(recipient : String, text : String) : void
+}
+class SmsChannel <<ConcreteImplementor>>
+class ViberChannel <<ConcreteImplementor>>
+class EmailChannel <<ConcreteImplementor>>
+class TelegramChannel <<ConcreteImplementor>> 
+
+class Main <<Client>> {
+  ~ {static} task2Bridge() : void
+}
+
+Notification "*" o--> "1" Channel : міст (channel)
+ArrivalNotification --|> Notification
+DelayNotification --|> Notification
+PaymentNotification --|> Notification
+SmsChannel ..|> Channel
+ViberChannel ..|> Channel
+EmailChannel ..|> Channel
+TelegramChannel ..|> Channel
+Main ..> Notification
+Main ..> Channel
+
+note right of TelegramChannel
+  Новий канал = 1 новий клас
+end note
+@enduml

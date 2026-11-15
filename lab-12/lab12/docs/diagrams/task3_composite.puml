@@ -1,0 +1,50 @@
+@startuml task3_composite
+title Завдання 3. Консолідація вантажу (Composite)
+skinparam classAttributeIconSize 0
+
+interface CargoComponent <<Component>> {
+  + getName() : String
+  + getWeight() : double
+  + getDeclaredValue() : double
+  + getShipmentCount() : int
+  + print(indent : String) : void
+}
+class Shipment <<Leaf>> {
+  - name : String
+  - weight : double
+  - declaredValue : double
+}
+abstract class CargoGroup <<Composite>> {
+  - name : String
+  - children : List<CargoComponent>
+  # {abstract} kind() : String
+  + add(c : CargoComponent) : void
+  + remove(c : CargoComponent) : void
+}
+class Bag <<Composite>> {
+  # kind() : String
+}
+class Pallet <<Composite>> {
+  # kind() : String
+}
+class CargoFlight <<Composite>> {
+  # kind() : String
+}
+class Main <<Client>> {
+  ~ {static} task3Composite() : void
+  ~ {static} report(node : CargoComponent) : void
+}
+
+Shipment ..|> CargoComponent
+CargoGroup ..|> CargoComponent
+Bag --|> CargoGroup
+Pallet --|> CargoGroup
+CargoFlight --|> CargoGroup
+CargoGroup o-- "0..*" CargoComponent : children
+Main ..> CargoComponent
+
+note bottom of CargoGroup
+  Мішок може містити інший мішок,
+  бо children - це CargoComponent.
+end note
+@enduml

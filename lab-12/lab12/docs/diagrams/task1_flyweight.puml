@@ -1,0 +1,54 @@
+@startuml task1_flyweight
+title Завдання 1. Відстеження відправлень на мапі (Flyweight)
+skinparam classAttributeIconSize 0
+
+class ShipmentType <<Flyweight>> {
+  - name : String
+  - icon : String
+  - color : String
+  - label : String
+  ~ ShipmentType(name, icon, color, label)
+  + getName() : String
+  + getIcon() : String
+  + getColor() : String
+  + getLabel() : String
+}
+
+class ShipmentTypeFactory <<FlyweightFactory>> {
+  - {static} POOL : Map<String, ShipmentType>
+  - {static} created : int
+  + {static} get(name, icon, color, label) : ShipmentType
+  + {static} getCreatedCount() : int
+}
+
+class ShipmentMarker <<Context>> {
+  - waybill : String
+  - lat : double
+  - lon : double
+  - status : String
+  - type : ShipmentType
+  + ShipmentMarker(waybill, lat, lon, status, type)
+  + getType() : ShipmentType
+  + describe() : String
+}
+
+class Main <<Client>> {
+  ~ {static} task1Flyweight() : void
+}
+
+ShipmentTypeFactory "1" o-- "0..5" ShipmentType : pool
+ShipmentMarker "*" --> "1" ShipmentType : спільний стан
+ShipmentTypeFactory ..> ShipmentType : <<create>>
+Main ..> ShipmentTypeFactory
+Main ..> ShipmentMarker : <<create>>
+
+note right of ShipmentType
+  Внутрішній (спільний) стан:
+  іконка, колір, підпис.
+  Існує 5 екземплярів.
+end note
+note bottom of ShipmentMarker
+  Зовнішній (унікальний) стан:
+  накладна, координати, статус.
+end note
+@enduml
