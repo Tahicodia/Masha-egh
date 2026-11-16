@@ -1,0 +1,120 @@
+@startuml task2_command
+title Завдання 2. Операції з посилками на сортувальному складі — Command
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class OperationProcessor <<Invoker>> {
+  -pending : BlockingQueue<WarehouseCommand>
+  -history : Deque<WarehouseCommand>
+  -journal : List<JournalEntry>
+  +submit(source : String, command : WarehouseCommand) : void
+  +processNext() : boolean
+  +processAll() : void
+  +undoLast() : boolean
+  +pendingCount() : int
+  +printJournal() : void
+}
+
+interface WarehouseCommand <<Command>> {
+  +execute() : void
+  +undo() : void
+  +description() : String
+}
+
+class MoveParcelCommand <<ConcreteCommand>> {
+  -warehouse : Warehouse
+  -parcelId : String
+  -targetSector : String
+  -previousSector : String
+  +execute() : void
+  +undo() : void
+  +description() : String
+}
+class LoadParcelCommand <<ConcreteCommand>> {
+  -warehouse : Warehouse
+  -parcelId : String
+  -vehicle : String
+  -previousSector : String
+  +execute() : void
+  +undo() : void
+  +description() : String
+}
+class MarkDamagedCommand <<ConcreteCommand>> {
+  -warehouse : Warehouse
+  -parcelId : String
+  -previousState : boolean
+  +execute() : void
+  +undo() : void
+  +description() : String
+}
+
+class Warehouse <<Receiver>> {
+  -parcels : Map<String, Parcel>
+  +register(p : Parcel) : void
+  +get(id : String) : Parcel
+  +moveToSector(id : String, sector : String) : void
+  +loadToVehicle(id : String, vehicle : String) : void
+  +unloadToSector(id : String, sector : String) : void
+  +setDamaged(id : String, damaged : boolean) : void
+  +printState() : void
+}
+
+class Parcel {
+  -id : String
+  -sector : String
+  -vehicle : String
+  -damaged : boolean
+  +getId() : String
+  +getSector() : String
+  +getVehicle() : String
+  +isDamaged() : boolean
+}
+
+class JournalEntry <<record>> {
+  +time : String
+  +action : String
+  +description : String
+}
+
+class EventLog <<Utility>> {
+  -{static} clock : LocalTime
+  +{static} log(source : String, event : String) : void
+  +{static} now() : String
+}
+
+class Main <<Client / Runner>> {
+  +{static} main(args : String[]) : void
+  ~{static} scenarioWarehouseOperations() : void
+}
+
+OperationProcessor o--> "0..*" WarehouseCommand : pending\n(черга FIFO)
+OperationProcessor o--> "0..*" WarehouseCommand : history\n(стек для undo)
+OperationProcessor *--> "0..*" JournalEntry : journal
+
+WarehouseCommand <|.. MoveParcelCommand
+WarehouseCommand <|.. LoadParcelCommand
+WarehouseCommand <|.. MarkDamagedCommand
+
+MoveParcelCommand "*" --> "1" Warehouse : receiver
+LoadParcelCommand "*" --> "1" Warehouse : receiver
+MarkDamagedCommand "*" --> "1" Warehouse : receiver
+
+Warehouse "1" *--> "0..*" Parcel
+Warehouse ..> EventLog
+OperationProcessor ..> EventLog
+OperationProcessor ..> JournalEntry : створює
+Main ..> OperationProcessor : submit / undoLast
+Main ..> WarehouseCommand : створює
+
+note bottom of WarehouseCommand
+  Command: операція = об'єкт, що вміє
+  виконатися (execute) і скасуватися (undo).
+  Стан для undo зберігається в самій команді.
+end note
+
+note right of OperationProcessor
+  Invoker: сканер лише ставить операцію в чергу,
+  жодна не губиться; виконання по одній;
+  undoLast() знімає останню зі стека.
+end note
+@enduml

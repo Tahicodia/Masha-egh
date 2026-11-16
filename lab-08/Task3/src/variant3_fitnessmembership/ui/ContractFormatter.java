@@ -1,5 +1,5 @@
 package variant3_fitnessmembership.ui;
-
+//**	Формує текст договору або документа з даними абонемента. */
 import variant3_fitnessmembership.application.SubscriptionReceipt;
 
 /** Pure Fabrication: форматування тексту договору (презентаційна відповідальність). */

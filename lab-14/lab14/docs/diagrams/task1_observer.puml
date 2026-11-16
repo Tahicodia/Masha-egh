@@ -1,0 +1,59 @@
+@startuml task1_observer
+title Завдання 1. Відстеження статусу відправлення (Observer)
+skinparam classAttributeIconSize 0
+
+interface StatusObserver <<Observer>> {
+  + getName() : String
+  + update(shipment : Shipment, oldStatus : String, newStatus : String) : void
+}
+
+class Shipment <<Subject / ConcreteSubject>> {
+  - waybill : String
+  - status : String
+  - observers : List<StatusObserver>
+  + Shipment(waybill : String, status : String)
+  + getWaybill() : String
+  + getStatus() : String
+  + subscribe(o : StatusObserver) : void
+  + unsubscribe(o : StatusObserver) : void
+  + changeStatus(newStatus : String, initiator : String) : void
+}
+
+class Sender <<ConcreteObserver>> {
+  - name : String
+  + update(...) : void
+}
+class Receiver <<ConcreteObserver>> {
+  - name : String
+  + update(...) : void
+}
+class Accounting <<ConcreteObserver>> {
+  - codAmount : double
+  + update(...) : void
+}
+class OnlineShop <<ConcreteObserver>> {
+  - shopName : String
+  + update(...) : void
+}
+class Main <<Client>> {
+  ~ {static} task1Observer() : void
+}
+
+Shipment "1" o--> "0..*" StatusObserver : observers
+Sender ..|> StatusObserver
+Receiver ..|> StatusObserver
+Accounting ..|> StatusObserver
+OnlineShop ..|> StatusObserver
+StatusObserver ..> Shipment : читає стан
+Main ..> Shipment
+Main ..> StatusObserver
+
+note right of Accounting
+  Сама вирішує, як реагувати:
+  діє лише на статус «вручено»
+end note
+note bottom of Shipment
+  changeStatus() сповіщає копію списку,
+  тому відписка під час сповіщення безпечна
+end note
+@enduml

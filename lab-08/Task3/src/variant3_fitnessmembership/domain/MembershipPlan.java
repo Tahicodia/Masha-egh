@@ -1,5 +1,5 @@
 package variant3_fitnessmembership.domain;
-
+/**Описує тариф і його вартість */
 import java.util.Objects;
 
 public final class MembershipPlan {

@@ -1,5 +1,5 @@
 package variant3_fitnessmembership.infrastructure;
-
+//** Надає стандартний список тарифів.*/
 import variant3_fitnessmembership.application.PlanCatalog;
 import variant3_fitnessmembership.domain.MembershipPlan;
 import variant3_fitnessmembership.domain.PlanType;

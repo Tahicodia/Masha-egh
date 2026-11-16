@@ -3,7 +3,7 @@ package variant3_fitnessmembership.domain;
 /** Тип пакету (поки без поведінки — логіка ціни ще в MembershipPlan, див. Task4). */
 public enum PlanType {
     DAY("Day"), FULL("Full"), VIP("VIP");
-
+/** */
     private final String displayName;
 
     PlanType(String displayName) { this.displayName = displayName; }

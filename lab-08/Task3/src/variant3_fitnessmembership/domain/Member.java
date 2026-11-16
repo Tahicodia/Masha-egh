@@ -1,5 +1,5 @@
 package variant3_fitnessmembership.domain;
-
+/**Зберыгаэ даны клыэнта ы логыку знижок */
 import java.util.Objects;
 
 public final class Member {

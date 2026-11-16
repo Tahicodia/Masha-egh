@@ -1,5 +1,5 @@
 package variant3_fitnessmembership.ui;
-
+//**Розбирає введені користувачем команди та дані. */
 import variant3_fitnessmembership.application.RegisterSubscriptionCommand;
 
 /** Pure Fabrication: перетворює сирий текст з консолі на DTO-команду. Без бізнес-логіки. */

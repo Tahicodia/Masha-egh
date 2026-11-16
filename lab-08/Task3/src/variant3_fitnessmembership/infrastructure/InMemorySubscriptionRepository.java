@@ -1,11 +1,10 @@
 package variant3_fitnessmembership.infrastructure;
-
-import variant3_fitnessmembership.application.SubscriptionRepository;
-import variant3_fitnessmembership.domain.Subscription;
-
+//**Зберігає абонементи в пам'яті. */
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import variant3_fitnessmembership.application.SubscriptionRepository;
+import variant3_fitnessmembership.domain.Subscription;
 
 /** Імітація БД (таблиця subscriptions). */
 public final class InMemorySubscriptionRepository implements SubscriptionRepository {

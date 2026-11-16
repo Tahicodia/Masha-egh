@@ -1,0 +1,84 @@
+@startuml task2_mediator
+title Завдання 2. Робота сортувального центру (Mediator)
+skinparam classAttributeIconSize 0
+
+enum SortingEvent {
+  PARCEL_ENTERED
+  WEIGHED
+  SCANNED
+  ROUTED
+  TRUCK_ARRIVED
+}
+
+interface SortingMediator <<Mediator>> {
+  + onEvent(sender : SortingDevice, event : SortingEvent, parcel : Parcel, detail : String) : void
+}
+
+class SortingCenter <<ConcreteMediator>> {
+  - {static} MAX_WEIGHT_KG : double
+  - trucksPresent : Set<String>
+  - waiting : Map<String, Deque<Parcel>>
+  + setDevices(belt, scale, scanner, sorter, zone) : void
+  + onEvent(sender, event, parcel, detail) : void
+  - rule(text : String) : void
+}
+
+abstract class SortingDevice <<Colleague>> {
+  # mediator : SortingMediator
+  - name : String
+  # SortingDevice(name : String, mediator : SortingMediator)
+  + getName() : String
+  # report(event : SortingEvent, parcel : Parcel, detail : String) : void
+}
+
+class IntakeBelt <<ConcreteColleague>> {
+  - running : boolean
+  + start() : void
+  + stop(reason : String) : void
+  + feed(p : Parcel) : void
+}
+class Scale <<ConcreteColleague>> {
+  + weigh(p : Parcel) : void
+}
+class BarcodeScanner <<ConcreteColleague>> {
+  + scan(p : Parcel) : void
+}
+class Sorter <<ConcreteColleague>> {
+  + route(p : Parcel, direction : String) : void
+}
+class LoadingZone <<ConcreteColleague>> {
+  + truckArrived(direction : String) : void
+  + load(p : Parcel) : void
+}
+class Parcel {
+  - id : String
+  - weightKg : double
+  - destination : String
+}
+class Main <<Client>> {
+  ~ {static} task2Mediator() : void
+}
+
+SortingCenter ..|> SortingMediator
+SortingDevice "*" --> "1" SortingMediator : mediator
+SortingCenter "1" --> "1" IntakeBelt
+SortingCenter "1" --> "1" Scale
+SortingCenter "1" --> "1" BarcodeScanner
+SortingCenter "1" --> "1" Sorter
+SortingCenter "1" --> "1" LoadingZone
+IntakeBelt --|> SortingDevice
+Scale --|> SortingDevice
+BarcodeScanner --|> SortingDevice
+Sorter --|> SortingDevice
+LoadingZone --|> SortingDevice
+SortingDevice ..> SortingEvent
+SortingDevice ..> Parcel
+Main ..> SortingCenter
+
+note right of SortingCenter
+  Усі правила взаємодії тут:
+  - вага > ліміту -> стоп стрічки
+  - машини немає -> завантаження відкладено
+  Пристрої між собою не знайомі.
+end note
+@enduml

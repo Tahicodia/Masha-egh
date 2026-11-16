@@ -1,5 +1,5 @@
 package variant3_fitnessmembership.infrastructure;
-
+//**Додає надсилання повідомлення після збереження абонемента. */
 import variant3_fitnessmembership.application.ClientNotifier;
 import variant3_fitnessmembership.application.SubscriptionRepository;
 import variant3_fitnessmembership.domain.Subscription;

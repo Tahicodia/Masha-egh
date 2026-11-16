@@ -1,10 +1,9 @@
 package variant3_fitnessmembership.infrastructure;
-
-import variant3_fitnessmembership.application.MemberRepository;
-import variant3_fitnessmembership.domain.Member;
-
+//** 	Зберігає та шукає клієнтів у пам'яті програми*/
 import java.util.HashMap;
 import java.util.Map;
+import variant3_fitnessmembership.application.MemberRepository;
+import variant3_fitnessmembership.domain.Member;
 
 /** Заглушка сховища клієнтів: відтворює тестові дані з Legacy-коду (телефон, дисконтна картка). */
 public final class InMemoryMemberRepository implements MemberRepository {

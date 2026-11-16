@@ -1,9 +1,8 @@
 package variant3_fitnessmembership.infrastructure;
-
+//**	Реалізує повідомлення клієнту через консоль. */
+import java.io.PrintStream;
 import variant3_fitnessmembership.application.ClientNotifier;
 import variant3_fitnessmembership.domain.Subscription;
-
-import java.io.PrintStream;
 
 /** Імітація push-сповіщення. */
 public final class ConsolePushNotifier implements ClientNotifier {

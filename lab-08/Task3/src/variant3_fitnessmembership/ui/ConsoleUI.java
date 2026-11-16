@@ -1,9 +1,8 @@
 package variant3_fitnessmembership.ui;
-
-import variant3_fitnessmembership.application.SubscriptionController;
-
+//** 	Відповідає за взаємодію з користувачем через консоль.*/
 import java.io.PrintStream;
 import java.util.Scanner;
+import variant3_fitnessmembership.application.SubscriptionController;
 
 /** Thin Console UI: лише читає введення, делегує та друкує результат. */
 public final class ConsoleUI {

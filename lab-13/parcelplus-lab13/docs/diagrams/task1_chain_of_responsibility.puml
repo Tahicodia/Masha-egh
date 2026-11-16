@@ -1,0 +1,101 @@
+@startuml task1_chain_of_responsibility
+title Завдання 1. Перевірка відправлення при прийомі — Chain of Responsibility
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+left to right direction
+
+enum ShipmentType {
+  DOMESTIC
+  INTERNATIONAL
+}
+
+class Shipment <<Request>> {
+  -id : String
+  -type : ShipmentType
+  -sender : String
+  -recipient : String
+  -items : List<String>
+  -weightKg : double
+  -lengthCm : int
+  -widthCm : int
+  -heightCm : int
+  -customsDeclaration : String
+  -hasLithiumBattery : boolean
+  -lithiumCertified : boolean
+  +getId() : String
+  +getType() : ShipmentType
+  +getWeightKg() : double
+}
+
+class ShipmentIntakeService <<Client>> {
+  -configs : Map<ShipmentType, List<ShipmentCheck>>
+  -heads : Map<ShipmentType, ShipmentCheck>
+  +configure(type : ShipmentType, checks : List<ShipmentCheck>) : void
+  +insertCheck(type : ShipmentType, position : int, check : ShipmentCheck) : void
+  +accept(shipment : Shipment) : boolean
+  -relink(type : ShipmentType) : void
+}
+
+abstract class ShipmentCheck <<Handler>> {
+  -next : ShipmentCheck
+  +setNext(next : ShipmentCheck) : ShipmentCheck
+  +{final} handle(shipment : Shipment) : boolean
+  #{abstract} validate(shipment : Shipment) : String
+  #name() : String
+}
+
+class WaybillCompletenessCheck <<ConcreteHandler>> {
+  #validate(shipment : Shipment) : String
+}
+class ProhibitedItemsCheck <<ConcreteHandler>> {
+  -{static} PROHIBITED : Set<String>
+  #validate(shipment : Shipment) : String
+}
+class WeightCheck <<ConcreteHandler>> {
+  +{static} MAX_WEIGHT_KG : double = 30.0
+  #validate(shipment : Shipment) : String
+}
+class DimensionsCheck <<ConcreteHandler>> {
+  +{static} MAX_SIDE_CM : int = 120
+  #validate(shipment : Shipment) : String
+}
+class InternationalRequirementsCheck <<ConcreteHandler>> {
+  #validate(shipment : Shipment) : String
+}
+class LithiumBatteryCheck <<ConcreteHandler, додається в runtime>> {
+  #validate(shipment : Shipment) : String
+}
+
+class EventLog <<Utility>> {
+  -{static} clock : LocalTime
+  +{static} log(source : String, event : String) : void
+  +{static} now() : String
+  +{static} resetClock(start : LocalTime) : void
+}
+
+ShipmentIntakeService "1" o--> "0..*" ShipmentCheck : ланцюги\n(по одному на тип)
+ShipmentIntakeService ..> Shipment : приймає
+ShipmentIntakeService ..> ShipmentType
+ShipmentCheck "1" o--> "0..1" ShipmentCheck : next
+ShipmentCheck ..> Shipment : перевіряє
+ShipmentCheck ..> EventLog : пише журнал
+Shipment "1" --> "1" ShipmentType
+
+ShipmentCheck <|-- WaybillCompletenessCheck
+ShipmentCheck <|-- ProhibitedItemsCheck
+ShipmentCheck <|-- WeightCheck
+ShipmentCheck <|-- DimensionsCheck
+ShipmentCheck <|-- InternationalRequirementsCheck
+ShipmentCheck <|-- LithiumBatteryCheck
+
+note bottom of ShipmentCheck
+  Handler: handle() викликає validate().
+  Відмова -> ланцюг зупиняється з причиною.
+  Успіх -> запит передається в next.
+end note
+
+note right of ShipmentIntakeService
+  Client: збирає й перебудовує ланцюги
+  окремо для DOMESTIC та INTERNATIONAL.
+end note
+@enduml

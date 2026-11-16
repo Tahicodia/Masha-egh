@@ -18,7 +18,7 @@ public final class Subscription {
     private final double discountAmount;
     private final double finalCost;
     private final Status status;
-
+//**Представляє абонемент та його фінансові характеристики */
     private Subscription(int id, Member member, MembershipPlan plan,
                          List<AdditionalService> services, LocalDate startDate) {
         this.id = id;

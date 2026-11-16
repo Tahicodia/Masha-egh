@@ -38,7 +38,7 @@ public class Task4_ISP_MultiFunctionPrinter {
         @Override public void scanDocument() { System.out.println("Scanning physical document..."); }
     }
 
-    /** Справжній «комбайн» реалізує всі ролі свідомо, а не з примусу. */
+    /** комбайн реалізує всі ролі свідомо, а не з примусу. */
     public static class OfficeMultiFunctionCenter
             implements PrintingDevice, DuplexPrintingDevice, ScanningDevice, FaxingDevice, StaplingDevice {
         @Override public void printDocument(String doc) { System.out.println("MFC printing: " + doc); }
