@@ -1,0 +1,68 @@
+@startuml task1_memento
+title Завдання 1. Memento: відновлення стану сортувальника
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+interface SorterMemento <<Memento (вузький інтерфейс)>> {
+  + label(): String
+  + createdAt(): String
+}
+
+class Sorter <<Originator>> {
+  - id: String
+  - binByDirection: Map<String, Integer>
+  - sortedPerBin: Map<Integer, Integer>
+  - queue: Deque<Parcel>
+  - totalSorted: int
+  + Sorter(id: String)
+  + id(): String
+  + assignBin(direction: String, bin: int): void
+  + enqueue(parcel: Parcel): void
+  + sortNext(): void
+  + powerFailure(): void
+  + save(label: String): SorterMemento
+  + restore(memento: SorterMemento): void
+  + describe(): String
+}
+
+class "Sorter.Snapshot" as Snapshot <<Concrete Memento>> {
+  - label: String
+  - createdAt: String
+  - binByDirection: Map<String, Integer>
+  - sortedPerBin: Map<Integer, Integer>
+  - queue: Deque<Parcel>
+  - totalSorted: int
+  - Snapshot(...)
+  + label(): String
+  + createdAt(): String
+}
+
+class SorterHistory <<Caretaker>> {
+  - snapshots: List<SorterMemento>
+  + checkpoint(sorter: Sorter, label: String): void
+  + restoreLast(sorter: Sorter): void
+  + restoreAt(sorter: Sorter, index: int): void
+  + size(): int
+  + labels(): List<String>
+}
+
+class "Sorter.Parcel" as Parcel <<record>> {
+  + waybill: String
+  + direction: String
+}
+
+Sorter +-- Snapshot : вкладений\nприватний клас
+Sorter +-- Parcel
+Snapshot ..|> SorterMemento
+Sorter ..> SorterMemento : <<create>>\nсворює знімок
+Sorter ..> Snapshot : <<use>>\nвідновлює зі знімка
+Sorter "1" *-- "0..*" Parcel : queue
+SorterHistory "1" o-- "0..*" SorterMemento : snapshots
+SorterHistory ..> Sorter : <<use>>\nsave / restore
+
+note right of SorterHistory
+  Caretaker бачить лише SorterMemento
+  (label, createdAt) і не може змінити
+  вміст знімка.
+end note
+@enduml

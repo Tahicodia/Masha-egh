@@ -1,0 +1,109 @@
+@startuml task3_visitor
+title Завдання 3. Visitor: операції над вантажем
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+interface ShipmentVisitor <<Visitor>> {
+  + visit(letter: Letter): void
+  + visit(parcel: Parcel): void
+  + visit(freight: Freight): void
+  + visit(shipment: InternationalShipment): void
+}
+
+class DeliveryCostVisitor <<Concrete Visitor>> {
+  - {static} SRC: String
+  - {static} LETTER_BASE: double
+  - {static} PARCEL_BASE: double
+  - {static} FREIGHT_BASE: double
+  - {static} INTL_BASE: double
+  - total: double
+  + total(): double
+  + visit(...): void
+  - add(c: Consignment, cost: double, formula: String): void
+}
+
+class CustomsVisitor <<Concrete Visitor>> {
+  - {static} DUTY_RATE: double
+  - declarations: int
+  - skipped: int
+  + declarations(): int
+  + skipped(): int
+  + visit(...): void
+  - skip(c: Consignment): void
+}
+
+class CarbonFootprintVisitor <<Concrete Visitor\n(нова операція)>> {
+  - {static} LETTER_KG_CO2: double
+  - {static} PARCEL_KG_CO2_PER_KG: double
+  - {static} FREIGHT_KG_CO2_PER_KG: double
+  - {static} INTL_KG_CO2_PER_KG: double
+  - totalKgCo2: double
+  + totalKgCo2(): double
+  + visit(...): void
+  - add(c: Consignment, kg: double): void
+}
+
+interface Consignment <<Element>> {
+  + waybill(): String
+  + accept(visitor: ShipmentVisitor): void
+}
+
+class Letter <<Concrete Element>> {
+  - waybill: String
+  - weightGrams: int
+  - registered: boolean
+  + accept(visitor: ShipmentVisitor): void
+}
+
+class Parcel <<Concrete Element>> {
+  - waybill: String
+  - weightKg: double
+  - volumeLiters: double
+  + accept(visitor: ShipmentVisitor): void
+}
+
+class Freight <<Concrete Element>> {
+  - waybill: String
+  - weightKg: double
+  - palletCount: int
+  + accept(visitor: ShipmentVisitor): void
+}
+
+class InternationalShipment <<Concrete Element>> {
+  - waybill: String
+  - weightKg: double
+  - country: String
+  - declaredValue: double
+  + accept(visitor: ShipmentVisitor): void
+}
+
+class ConsignmentBatch <<Object Structure>> {
+  - id: String
+  - items: List<Consignment>
+  + add(item: Consignment): void
+  + accept(visitor: ShipmentVisitor): void
+  + describe(): List<String>
+}
+
+DeliveryCostVisitor ..|> ShipmentVisitor
+CustomsVisitor ..|> ShipmentVisitor
+CarbonFootprintVisitor ..|> ShipmentVisitor
+
+Letter ..|> Consignment
+Parcel ..|> Consignment
+Freight ..|> Consignment
+InternationalShipment ..|> Consignment
+
+ConsignmentBatch "1" o-- "0..*" Consignment : items
+ConsignmentBatch ..> ShipmentVisitor : передає
+Consignment ..> ShipmentVisitor : accept → visit(this)
+ShipmentVisitor ..> Letter
+ShipmentVisitor ..> Parcel
+ShipmentVisitor ..> Freight
+ShipmentVisitor ..> InternationalShipment
+
+note bottom of CarbonFootprintVisitor
+  Додається одним класом;
+  класи відправлень не змінюються.
+end note
+@enduml

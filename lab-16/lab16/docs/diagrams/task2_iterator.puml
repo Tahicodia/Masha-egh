@@ -1,0 +1,128 @@
+@startuml task2_iterator
+title Завдання 2. Iterator: обхід відправлень у машині
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+interface ShipmentCollection <<Aggregate>> {
+  + createRouteIterator(): ShipmentIterator
+  + createUnloadingIterator(): ShipmentIterator
+  + createDeclaredValueIterator(): ShipmentIterator
+}
+
+class Van <<Concrete Aggregate>> {
+  - id: String
+  - pallets: List<Pallet>
+  + Van(id: String)
+  + id(): String
+  + addPallet(pallet: Pallet): void
+  ~ pallets(): List<Pallet>
+  + describeStructure(): List<String>
+  + createRouteIterator(): ShipmentIterator
+  + createUnloadingIterator(): ShipmentIterator
+  + createDeclaredValueIterator(): ShipmentIterator
+}
+
+interface "ShipmentIterator" as ShipmentIterator <<Iterator>> {
+  + hasNext(): boolean
+  + next(): Shipment
+  + name(): String
+}
+
+abstract class LookaheadIterator <<Abstract Iterator>> {
+  - buffered: Shipment
+  - ready: boolean
+  # {abstract} advance(): Shipment
+  + hasNext(): boolean
+  + next(): Shipment
+}
+
+class RouteOrderIterator <<Concrete Iterator>> {
+  - ordered: List<Shipment>
+  - position: int
+  ~ RouteOrderIterator(van: Van)
+  # advance(): Shipment
+  + name(): String
+}
+
+class UnloadingOrderIterator <<Concrete Iterator>> {
+  - cursor: DepthFirstCursor
+  ~ UnloadingOrderIterator(van: Van)
+  # advance(): Shipment
+  + name(): String
+}
+
+class DeclaredValueIterator <<Concrete Iterator>> {
+  - cursor: DepthFirstCursor
+  ~ DeclaredValueIterator(van: Van)
+  # advance(): Shipment
+  + name(): String
+}
+
+class DepthFirstCursor <<helper>> {
+  - stack: Deque<Iterator<LoadNode>>
+  ~ DepthFirstCursor(roots: Iterator<LoadNode>)
+  ~ nextShipment(): Shipment
+}
+
+interface LoadNode <<Component>> {
+  + label(): String
+}
+
+abstract class Container <<Composite>> {
+  - label: String
+  - children: List<LoadNode>
+  + add(node: LoadNode): Container
+  ~ children(): List<LoadNode>
+  ~ {abstract} kind(): String
+  ~ describe(depth: int, out: List<String>): void
+}
+
+class Pallet {
+  + Pallet(label: String)
+}
+
+class Bag {
+  + Bag(label: String)
+}
+
+class Shipment <<Leaf>> {
+  - waybill: String
+  - routeStop: int
+  - declaredValue: double
+  + waybill(): String
+  + routeStop(): int
+  + declaredValue(): double
+  + hasDeclaredValue(): boolean
+}
+
+Van ..|> ShipmentCollection
+Van ..> ShipmentIterator : <<create>>
+Van "1" *-- "1..*" Pallet : pallets
+
+LookaheadIterator ..|> ShipmentIterator
+RouteOrderIterator --|> LookaheadIterator
+UnloadingOrderIterator --|> LookaheadIterator
+DeclaredValueIterator --|> LookaheadIterator
+
+RouteOrderIterator ..> Van : читає палети
+UnloadingOrderIterator ..> Van : читає палети
+DeclaredValueIterator ..> Van : читає палети
+RouteOrderIterator ..> DepthFirstCursor
+UnloadingOrderIterator "1" *-- "1" DepthFirstCursor
+DeclaredValueIterator "1" *-- "1" DepthFirstCursor
+DepthFirstCursor ..> LoadNode
+
+Container ..|> LoadNode
+Shipment ..|> LoadNode
+Pallet --|> Container
+Bag --|> Container
+Container "1" o-- "0..*" LoadNode : children
+ShipmentIterator ..> Shipment : повертає
+
+note right of Van
+  Структура (палети → мішки → мішки)
+  прихована: pallets() та children()
+  мають пакетний доступ (~).
+  Клієнти працюють лише з ShipmentIterator.
+end note
+@enduml
