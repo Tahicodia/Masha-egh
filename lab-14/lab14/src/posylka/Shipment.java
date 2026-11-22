@@ -1,6 +1,6 @@
 package posylka;
 
-import java.util.ArrayList;
+import  java.util.ArrayList;
 import java.util.List;
 
 /** Subject / ConcreteSubject: відправлення. Не знає конкретних отримувачів, лише інтерфейс StatusObserver. */
