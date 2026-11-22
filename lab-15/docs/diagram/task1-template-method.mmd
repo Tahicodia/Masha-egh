@@ -1,0 +1,49 @@
+classDiagram
+    direction TB
+    class DeliveryProcedure {
+        <<AbstractClass>>
+        +deliver(parcel: Parcel) void
+        #identifyRecipient(parcel: Parcel)* void
+        #confirm(parcel: Parcel)* void
+        #inspectContents(parcel: Parcel) void
+        -checkPayment(parcel: Parcel) void
+        -handOver(parcel: Parcel) void
+        -closeWaybill(parcel: Parcel) void
+        #log(event: String) void
+    }
+    class BranchDelivery {
+        <<ConcreteClass>>
+        #identifyRecipient(parcel: Parcel) void
+        #inspectContents(parcel: Parcel) void
+        #confirm(parcel: Parcel) void
+    }
+    class ParcelLockerDelivery {
+        <<ConcreteClass>>
+        #identifyRecipient(parcel: Parcel) void
+        #confirm(parcel: Parcel) void
+    }
+    class CourierDelivery {
+        <<ConcreteClass>>
+        #identifyRecipient(parcel: Parcel) void
+        #confirm(parcel: Parcel) void
+    }
+    class Parcel {
+        <<Domain>>
+        -number: String
+        -codAmount: int
+        +Parcel(number: String, codAmount: int)
+        +getNumber() String
+        +getCodAmount() int
+    }
+    class Log {
+        <<Utility>>
+        -minutes: int$
+        +print(source: String, event: String)$ void
+    }
+    DeliveryProcedure <|-- BranchDelivery
+    DeliveryProcedure <|-- ParcelLockerDelivery
+    DeliveryProcedure <|-- CourierDelivery
+    DeliveryProcedure ..> Parcel : uses
+    DeliveryProcedure ..> Log : uses
+    note for DeliveryProcedure "Template Method: AbstractClass<br>deliver() — final шаблонний метод,<br>порядок етапів незмінний.<br>inspectContents() — hook з поведінкою за замовчуванням"
+    note for BranchDelivery "ConcreteClass: перевизначає<br>ідентифікацію, підтвердження<br>та необов'язковий огляд вмісту"

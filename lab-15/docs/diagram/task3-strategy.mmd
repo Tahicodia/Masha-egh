@@ -1,0 +1,62 @@
+classDiagram
+    direction TB
+    class Courier {
+        <<Context>>
+        -name: String
+        -strategy: RouteStrategy
+        +Courier(name: String, strategy: RouteStrategy)
+        +setStrategy(strategy: RouteStrategy) void
+        +planRoute(addresses: List~Address~) void
+    }
+    class RouteStrategy {
+        <<interface · Strategy>>
+        +getName() String
+        +buildRoute(addresses: List~Address~) List~Address~
+    }
+    class ShortestDistanceStrategy {
+        <<ConcreteStrategy>>
+        +getName() String
+        +buildRoute(addresses: List~Address~) List~Address~
+    }
+    class UrgentFirstStrategy {
+        <<ConcreteStrategy>>
+        +getName() String
+        +buildRoute(addresses: List~Address~) List~Address~
+    }
+    class TrafficAwareStrategy {
+        <<ConcreteStrategy>>
+        +getName() String
+        +buildRoute(addresses: List~Address~) List~Address~
+    }
+    class EcoRouteStrategy {
+        <<ConcreteStrategy>>
+        +getName() String
+        +buildRoute(addresses: List~Address~) List~Address~
+        -emission(a: Address) double
+    }
+    class Address {
+        <<Domain>>
+        -name: String
+        -distanceKm: double
+        -urgent: boolean
+        -trafficMinutes: int
+        +getName() String
+        +getDistanceKm() double
+        +isUrgent() boolean
+        +getTrafficMinutes() int
+    }
+    class Log {
+        <<Utility>>
+        -minutes: int$
+        +print(source: String, event: String)$ void
+    }
+    Courier "1" o-- "1" RouteStrategy : strategy
+    RouteStrategy <|.. ShortestDistanceStrategy
+    RouteStrategy <|.. UrgentFirstStrategy
+    RouteStrategy <|.. TrafficAwareStrategy
+    RouteStrategy <|.. EcoRouteStrategy
+    RouteStrategy ..> "0..*" Address : впорядковує
+    Courier ..> "0..*" Address : uses
+    Courier ..> Log : uses
+    note for Courier "Strategy: Context<br>принцип змінюється під час виконання<br>через setStrategy()"
+    note for EcoRouteStrategy "Новий принцип —<br>один клас без змін у Courier"

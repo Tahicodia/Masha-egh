@@ -1,0 +1,86 @@
+classDiagram
+    direction TB
+    class Shipment {
+        <<Context>>
+        -number: String
+        -address: String
+        -state: ShipmentState
+        +Shipment(number: String, address: String)
+        ~setState(newState: ShipmentState) void
+        ~setAddress(address: String) void
+        ~log(event: String) void
+        +accept() void
+        +send() void
+        +arrive() void
+        +deliver() void
+        +changeAddress(address: String) void
+        +redirect(address: String) void
+        +storeDay() void
+    }
+    class ShipmentState {
+        <<State>>
+        +getName()* String
+        +accept(shipment: Shipment) void
+        +send(shipment: Shipment) void
+        +arrive(shipment: Shipment) void
+        +deliver(shipment: Shipment) void
+        +changeAddress(shipment: Shipment, address: String) void
+        +redirect(shipment: Shipment, address: String) void
+        +storeDay(shipment: Shipment) void
+        #deny(shipment: Shipment, operation: String) void
+    }
+    class CreatedState {
+        <<ConcreteState>>
+        +getName() String
+        +changeAddress(shipment: Shipment, address: String) void
+        +accept(shipment: Shipment) void
+    }
+    class AcceptedState {
+        <<ConcreteState>>
+        +getName() String
+        +changeAddress(shipment: Shipment, address: String) void
+        +send(shipment: Shipment) void
+    }
+    class InTransitState {
+        <<ConcreteState>>
+        +getName() String
+        +redirect(shipment: Shipment, address: String) void
+        +arrive(shipment: Shipment) void
+    }
+    class AtBranchState {
+        <<ConcreteState>>
+        -MAX_STORAGE_DAYS: int$
+        -days: int
+        +getName() String
+        +deliver(shipment: Shipment) void
+        +storeDay(shipment: Shipment) void
+    }
+    class DeliveredState {
+        <<ConcreteState>>
+        +getName() String
+    }
+    class ReturnState {
+        <<ConcreteState>>
+        +getName() String
+    }
+    class Log {
+        <<Utility>>
+        -minutes: int$
+        +print(source: String, event: String)$ void
+    }
+    Shipment "1" --> "1" ShipmentState : state
+    ShipmentState ..> Shipment : uses
+    ShipmentState <|-- CreatedState
+    ShipmentState <|-- AcceptedState
+    ShipmentState <|-- InTransitState
+    ShipmentState <|-- AtBranchState
+    ShipmentState <|-- DeliveredState
+    ShipmentState <|-- ReturnState
+    CreatedState ..> AcceptedState : accept()
+    AcceptedState ..> InTransitState : send()
+    InTransitState ..> AtBranchState : arrive()
+    AtBranchState ..> DeliveredState : deliver()
+    AtBranchState ..> ReturnState : 5 днів зберігання
+    Shipment ..> Log : uses
+    note for Shipment "State: Context<br>делегує кожну операцію поточному стану,<br>без розгалужень за статусом"
+    note for ShipmentState "State: абстрактний стан<br>за замовчуванням відмовляє (deny)<br>з зрозумілим повідомленням"
